@@ -22,7 +22,7 @@
 bool started, released = false;
 unsigned long remaining = FLIGHT_TIME;
 char* remainOut = (char*) malloc(sizeof(char) * 8); // reserve 8 chars for formatted time output
-unsigned long current;
+unsigned long current = 0;
 
 Adafruit_SSD1306 display(W, H, &Wire, RST);
 
@@ -43,16 +43,19 @@ void setup(){
   // remainOut = timeFormat();
   display.setCursor(0,10);
   display.setTextSize(2);
-  display.print(String(remaining)); // TODO : Add formatted time output and replace String(remaining) with remainOut 
-
+  
   pinMode(START, INPUT);
 }
 
 void loop(){
     // loop here
+	
+	display.print(String(remaining)); // TODO : Add formatted time output and replace String(remaining) with remainOut 
     display.display(); // update what has been drawn on display
-    if (!started && digitalRead(START)) {
-      display.setCursor(0,32);
-      display.print("Sure?");
-    }
+   	if (!started) {
+	 	current = millis();
+		while(current < millis() + 1000);
+		remaining -= 1000;
+	}	
+	
 }
