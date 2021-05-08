@@ -9,8 +9,8 @@
 
 // display
 #define ADDR 	0x3c
-#define H 		32
-#define W		 	128
+#define H 	32
+#define W	128
 #define RST 	-1
 
 // reserved pins
@@ -57,7 +57,7 @@ void loop(){
 	/* winding sequence 
 	 * just a loop to affix the glider to the balloon */
 	
-	servo.write(90); 								// Stop servo movement
+	servo.write(90);		// Stop servo movement
 	while (!digitalRead(WINDUP)) {
 		servo.write(0);
 	}
@@ -109,8 +109,8 @@ void loop(){
 		display.print("es gibt nichts\nwas mich hält\nau revoir");
 		current = millis() + SERVO_TIME;
 		while (millis < current)servo.write(180); // unwind the nuts
-		servo.write(90);													// stop rotation
-		while (1) asm volatile("nop"); 						// idle
+		servo.write(90);			  // stop rotation
+		while (1) asm volatile("nop"); 		  // idle
   }	
 }
 
