@@ -1,4 +1,4 @@
-/* includes */
+ /* includes */
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_SSD1306.h>
@@ -7,9 +7,9 @@
 /* defines */
 
 // display
-#define ADDR 0x78
-#define H 128
-#define W 64
+#define ADDR 0x3c
+#define H 32
+#define W 128
 #define RST -1
 // reserved pins
 #define START 0
@@ -28,26 +28,31 @@ Adafruit_SSD1306 display(W, H, &Wire, RST);
 
 /* function declarations */
 
-void timeFormat(); // TODO : add implemention!
+//void timeFormat(); // TODO : add implemention!
 
-int main(void) {
-	// setup here
-	display.begin(SSD1306_SWITCHCAPVCC, ADDR);
-	display.clearDisplay();
-	display.setTextSize(2);
-	display.print("time till release:");
-	display.setCursor(0,16);
-	// remainOut = timeFormat();
-	display.print(String(remaining)); // TODO : Add formatted time output and replace String(remaining) with remainOut 
+void setup(){
+ // setup here
+  display.begin(SSD1306_SWITCHCAPVCC, ADDR);
+    
+  display.clearDisplay();
+  display.drawPixel(10,10, SSD1306_WHITE);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0,0); 
+  display.setTextSize(0);
+  display.print("time till release:");
+  // remainOut = timeFormat();
+  display.setCursor(0,10);
+  display.setTextSize(2);
+  display.print(String(remaining)); // TODO : Add formatted time output and replace String(remaining) with remainOut 
 
-	pinMode(START, INPUT);
-	while(1) {
-		// loop here
-		display.display(); // update what has been drawn on display
-		if (!started && digitalRead(START)) {
-			display.setCursor(0,32);
-			display.print("Sure?");
+  pinMode(START, INPUT);
+}
 
-		}
-	}	
+void loop(){
+    // loop here
+    display.display(); // update what has been drawn on display
+    if (!started && digitalRead(START)) {
+      display.setCursor(0,32);
+      display.print("Sure?");
+    }
 }
