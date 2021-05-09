@@ -22,6 +22,8 @@
 #define FLIGHT_TIME (115 * 60000) 	// Flight time in minutes
 #define SERVO_TIME 	(20 * 1000) 	// Servo rotation time in seconds TODO: add actual rotation time
 
+#define DEBUG 1
+
 /* global vars */
 bool started, released = false;
 unsigned long remaining = FLIGHT_TIME;
@@ -33,30 +35,50 @@ Servo servo;
 
 void setup(){
 
- 	// setup here
+#ifdef DEBUG
+    Serial.begin(9600);
+    Serial.println("Starting display setup");
+#endif 	
+    // setup here
 	display.begin(SSD1306_SWITCHCAPVCC, ADDR);
-  	display.setRotation(1); 
+  	display.setRotation(3); 
 	display.clearDisplay();
   	display.setTextColor(SSD1306_WHITE);
 	display.setCursor(0,0); 
   	display.setTextSize(0);
-	
-	servo.attach(SERVO);
+
+#ifdef DEBUG
+    Serial.println("Display setup complete.");
+#endif
+
+    servo.attach(SERVO);
   
 	pinMode(START, INPUT_PULLUP);	// ATTENTION!
 	pinMode(WINDUP, INPUT_PULLUP);	// TO ACTIVATE BUTTONS, PINS NEED TO BE LOW! 
+
+    display.print("Ready to launch.");
+    display.display();
+#ifdef
+    Serial.println("Entering loop");
+#endif
 }
 
 void loop(){
   	// loop here
-	
-	display.print("Ready to start.");
-
-	/* winding sequence 
+#ifdef
+    Serial.println("Loop!");
+#endif
+    /* winding sequence 
 	 * just a loop to affix the glider to the balloon */
-	if (digitalRead(SERVO)) servo.write(90); // if the button isn't pressed, stop the servo.
-	else servo.write(0); 		
-	
+	if (digitalRead(SERVO)){
+       servo.write(90);// if the button isn't pressed, stop the servo. 
+    }
+	else { 
+       servo.write(0); 		
+#ifdef DEBUG
+      Serial.println("---Servo winding---");
+#endif 
+    }
 
 	/* start sequence
 	 * confirm launch by having the user press
@@ -65,6 +87,10 @@ void loop(){
 	if (!started && !digitalRead(START)) {
 		clearRect(0,0, 128, 9);
 		display.print("You sure?");
+        display.display();
+#ifdef DEBUG
+        Serial.println("--Start dialogue activated");
+#endif
 		delay(500);
 		current = millis() + 10000;
 		// ten second timeout 
@@ -77,6 +103,9 @@ void loop(){
 				display.setTextSize(3);
 				break;
 			}
+#ifdef DEBUG
+            Serial.println("--Timed out");
+#endif
 		}
 	}
 
@@ -84,28 +113,36 @@ void loop(){
 	 * the loop that will be working most of the flight */
 
 	while (started) {
-
+#ifdef DEBUG
+        Serial.println("Flight loop!");
+#endif
+       	clearRect(0, 9, 128, 32);
+  		display.setCursor(0,8);
+  		display.print(formatTime(remaining));
+#ifdef DEBUG
+        Serial.println(formatTime(remaining));
+#endif
+        display.display(); 
  		delay(1000);
   		if (remaining) remaining -= 1000;
 		if (!remaining) {
 			started = false; 
 			released = true;
 		}
-		clearRect(0, 9, 128, 32);
-  		display.setCursor(0,8);
-  		display.print(formatTime(remaining));
-		display.display();
-		
   	}
   
 	/* release sequence 
 	 * release the glider, print a song quote. */
 	
-	if (released) { 
-  	display.setCursor(0,0);
+	if (released) {
+#ifdef DEBUG
+        Serial.println("Releasing glider");
+#endif
+  	    display.setCursor(0,0);
 		clearRect(0,0,128,32);
-		display.print("es gibt nichts\nwas mich hält\nau revoir");
-		current = millis() + SERVO_TIME;
+		display.print("es gibt nichts\nwas mich haelt\nau revoir");
+		display.display();
+        current = millis() + SERVO_TIME;
 		while (millis < current)servo.write(180); 	// unwind the nuts
 		servo.write(90);							// stop rotation
 		while (1) asm volatile("nop"); 				// idle
