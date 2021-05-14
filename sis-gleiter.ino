@@ -22,7 +22,7 @@
 #define FLIGHT_TIME (115 * 60000) 	// Flight time in minutes
 #define SERVO_TIME 	(20 * 1000) 	// Servo rotation time in seconds TODO: add actual rotation time
 
-#define DEBUG 1
+#define DEBUG 1 // Comment this line to disable debug features
 
 /* global vars */
 bool started, released = false;
@@ -65,7 +65,7 @@ void setup(){
 
 void loop(){
   	// loop here
-#ifdef
+#ifdef DEBUG
     Serial.println("Loop!");
 #endif
     /* winding sequence 
