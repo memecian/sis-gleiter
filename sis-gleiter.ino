@@ -58,7 +58,7 @@ void setup(){
 
     display.print("Ready to launch.");
     display.display();
-#ifdef
+#ifdef DEBUG
     Serial.println("Entering loop");
 #endif
 }
