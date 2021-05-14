@@ -109,16 +109,16 @@ void loop(){
 				display.print("Time until release");
 				started = true;
 				display.setTextSize(2);
+				current = 0;
 				break;
 			}
+		}
 #ifdef DEBUG
 	Serial.println("--Timed out");
 #endif
 		clearRect(0,0, 128, 9);
 		display.setCursor(0,0);
-		display.print("Ready to launch");		
-		}
-
+		display.print("Ready to launch");
 	}
 
 	/* main loop 
