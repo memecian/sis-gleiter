@@ -134,7 +134,7 @@ void loop(){
   		display.print(formatTime(remaining));
         display.display(); 
  		delay(1000);
-  		if (remaining < 0) remaining -= 1000;
+  		if (remaining < 0) remaining = remaining - 1000;
 		if (remaining == 0) {
 			started = false; 
 			released = true;
@@ -172,10 +172,11 @@ void clearRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
 char* formatTime(long time) {
 	char* out = (char *) malloc(sizeof(char) * 21); // stops any complaints from the compiler.
 	long hh, mm, ss;
-	time = time/60000;
-	hh = (long) floor(time / 60);
-	mm = time % 60;
-	ss = 0;
+	time = time/1000; // convert to seconds from milliseconds
+	mm = time / 60;
+	ss = time % 60;
+	hh = mm / 60;	
+	mm = mm % 60;
 	sprintf(out, "%02.2hd:%02.2hd:%02.2hd", hh, mm ,ss);	
 #ifdef DEBUG
 	Serial.print(F("\n ---- \n"));
