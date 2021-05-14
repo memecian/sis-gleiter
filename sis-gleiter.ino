@@ -122,7 +122,7 @@ void loop(){
 
 	while (started) {
 #ifdef DEBUG
-		Serial.println("Filght loop!");
+		Serial.println("Flight loop!");
 		sprintf(debugOut, "started = %u\n released = %u\nremaining = %lu\nremainOut = %s\ncurrent = %lu", started, released, remaining, formatTime(remaining), current);
     	Serial.println(debugOut);
 #endif
