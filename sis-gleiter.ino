@@ -35,6 +35,7 @@ Servo servo;
 
 #ifdef DEBUG
 	char debugOut[128] = {0};
+	long slu = milllis() + 1000; //SinceLastUpdate
 #endif
 
 void setup(){
@@ -70,10 +71,13 @@ void setup(){
 void loop(){
   	// loop here
 #ifdef DEBUG
-	remainOut = formatTime(remaining);
-	sprintf(debugOut, "started = %u\n released = %u\n remaining = %lu\n, remainOut = %s\n, current = %lu", started, released, remaining, remainOut, current);
-    Serial.println("Loop!");
-	Serial.println(debugOut);
+	Serial.println("Loop!");
+	if (slu <= millis()) {
+		remainOut = formatTime(remaining);
+		sprintf(debugOut, "started = %u\n released = %u\n remaining = %lu\n, remainOut = %s\n, current = %lu", started, released, remaining, remainOut, current);
+		Serial.println(debugOut);
+		slu = millis() + 1000;
+}
 #endif
     /* winding sequence 
 	 * just a loop to affix the glider to the balloon */
