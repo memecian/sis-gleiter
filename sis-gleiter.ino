@@ -34,8 +34,9 @@ Adafruit_SSD1306 display(W, H, &Wire, RST);
 Servo servo;
 
 #ifdef DEBUG
+#define INTERVAL 1000 // interval in ms for debug messages
 	char debugOut[128] = {0};
-	long slu = milllis() + 1000; //SinceLastUpdate
+	long slu = millis() + INTERVAL; //SinceLastUpdate
 #endif
 
 void setup(){
@@ -72,12 +73,7 @@ void loop(){
   	// loop here
 #ifdef DEBUG
 	Serial.println("Loop!");
-	if (slu <= millis()) {
-		remainOut = formatTime(remaining);
-		sprintf(debugOut, "started = %u\n released = %u\n remaining = %lu\n, remainOut = %s\n, current = %lu", started, released, remaining, remainOut, current);
-		Serial.println(debugOut);
-		slu = millis() + 1000;
-}
+	if (slu <= millis()) debug_variables();
 #endif
     /* winding sequence 
 	 * just a loop to affix the glider to the balloon */
@@ -115,10 +111,14 @@ void loop(){
 				display.setTextSize(2);
 				break;
 			}
+#ifdef DEBUG
+	Serial.println("--Timed out");
+#endif
 		clearRect(0,0, 128, 9);
 		display.setCursor(0,0);
 		display.print("Ready to launch");		
 		}
+
 	}
 
 	/* main loop 
@@ -126,21 +126,16 @@ void loop(){
 
 	while (started) {
 #ifdef DEBUG
-		Serial.println("Flight loop!");
-		sprintf(debugOut, "started = %u\n released = %u\nremaining = %lu\nremainOut = %s\ncurrent = %lu", started, released, remaining, formatTime(remaining), current);
-    	Serial.println(debugOut);
+	debug_variables();
 #endif
 		remaining = FLIGHT_TIME;
        	clearRect(0, 9, 128, 32);
   		display.setCursor(0,8);
   		display.print(formatTime(remaining));
-#ifdef DEBUG
-        Serial.println(formatTime(remaining));
-#endif
         display.display(); 
  		delay(1000);
-  		if (remaining) remaining -= 1000;
-		if (!remaining) {
+  		if (remaining < 0) remaining -= 1000;
+		if (remaining == 0) {
 			started = false; 
 			released = true;
 		}
@@ -171,6 +166,9 @@ void clearRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
 	display.fillRect(x, y, w, h, BLACK);
 }
 
+/* formatTime(time in ms)
+ * returns remaining time in hh:mm:ss format */
+
 char* formatTime(long time) {
 	char* out = (char *) malloc(sizeof(char) * 21); // stops any complaints from the compiler.
 	long hh, mm, ss;
@@ -179,5 +177,21 @@ char* formatTime(long time) {
 	mm = time % 60;
 	ss = 0;
 	sprintf(out, "%02.2hd:%02.2hd:%02.2hd", hh, mm ,ss);	
+#ifdef DEBUG
+	Serial.print(F("\n ---- \n"));
+	Serial.println(out);
+#endif
 	return out;
 }
+
+#ifdef DEBUG
+/* debug_variables()
+ * prints out a multiline string with all system vaiables at INTERVAL intervals */
+void debug_variables() {
+	remainOut = formatTime(remaining);
+	sprintf(debugOut, "started = %u\nreleased = %u\nremaining = %lu\nremainOut = %s\ncurrent = %lu", started, released, remaining, remainOut, current);
+	Serial.println(debugOut);
+	slu = millis() + INTERVAL;
+}
+#endif
+
