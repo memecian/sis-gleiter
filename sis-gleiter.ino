@@ -25,6 +25,7 @@
 
 /* global vars */
 bool started, dialogue, released = false;
+char remain_out[20] = {0};
 unsigned long remaining = FLIGHT_TIME;
 unsigned long current = 0;
 
@@ -80,10 +81,11 @@ void loop(){
 					clearRect(0,0,128,32);
 					display.setCursor(0,0);
 					remaining = FLIGHT_TIME - (millis() - current);
+					remain_out = formatTime(remaining);
 #ifdef DEBUG
-					Serial.println(formatTime(remaining));
+					Serial.println(formatTime(remain_out));
 #endif // DEBUG			
-					display.print(formatTime(remaining));
+					display.print(formatTime(remain_out));
 					display.display();
 				}
 			}
@@ -113,7 +115,7 @@ void clearRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
  * returns remaining time in hh:mm:ss format */
 
 char* formatTime(long time) {
-	char out[10] ;
+	char out[20] ;
 	long hh, mm, ss;
 	time = floor(time/1000); // convert to seconds from milliseconds
 	mm = time / 60;
