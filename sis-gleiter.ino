@@ -39,7 +39,7 @@ Servo servo;
 	long slu = millis() + INTERVAL; //SinceLastUpdate
 #endif
 
-void setup(){
+void setup() {
 
 #ifdef DEBUG
     Serial.begin(9600);
@@ -56,13 +56,10 @@ void setup(){
 #ifdef DEBUG
     Serial.println("Display setup complete.");
 #endif
-
     servo.attach(SERVO);
-  
 	pinMode(START, INPUT_PULLUP);	// ATTENTION!
 	pinMode(WINDUP, INPUT_PULLUP);	// TO ACTIVATE BUTTONS, PINS NEED TO BE LOW! 
-
-    display.print("Ready to launch.");
+    display.print(F("Ready to launch."));
     display.display();
 #ifdef DEBUG
     Serial.println("Entering loop");
@@ -87,38 +84,15 @@ void loop(){
 #endif 
     }
 
-	/* start sequence
-	 * confirm launch by having the user press
-	 * the START button twice				*/
-
 	if (!started && !digitalRead(START)) {
-		clearRect(0,0, 128, 9);
-		display.setCursor(0,0);
-		display.print("You sure?");
-        display.display();
-#ifdef DEBUG
-        Serial.println("--Start dialogue activated");
-#endif
-		delay(2000);
-		current = millis() + 10000;
-		// ten second timeout 
-		while (millis < current) {	
-			if (!digitalRead(START)) { 
-				clearRect(0, 0, 128, 32);
-				display.setCursor(0,0);
-				display.print("Time until release");
-				started = true;
-				display.setTextSize(2);
-				current = 0;
-				break;
-			}
+		startSequence();
 		}
 #ifdef DEBUG
 	Serial.println("--Timed out");
 #endif
 		clearRect(0,0, 128, 9);
 		display.setCursor(0,0);
-		display.print("Ready to launch");
+		display.print(F("Ready to launch"));
 	}
 
 	/* main loop 
@@ -145,18 +119,7 @@ void loop(){
 	 * release the glider, print a song quote. */
 
 	if (released) {
-#ifdef DEBUG
-        Serial.println("Releasing glider");
-#endif
-  	    display.setCursor(0,0);
-		clearRect(0,0,128,32);
-		display.print("es gibt nichts\nwas mich haelt\nau revoir");
-		display.display();
-        current = millis() + SERVO_TIME;
-		while (millis < current)servo.write(180); 	// unwind the nuts
-		servo.write(90);							// stop rotation
-		while (1) asm volatile("nop"); 				// idle
-  	}	
+		releaseSequence();
 }
 
 /* function declarations */
@@ -164,6 +127,34 @@ void loop(){
 void clearRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
 	display.drawRect(x, y, w, h, BLACK);
 	display.fillRect(x, y, w, h, BLACK);
+}
+
+/* startSequence()
+ * confirm launch by having the user press
+ * the START button twice				*/
+
+void startSequence(void) {
+	clearRect(0,0, 128, 9);
+	display.setCursor(0,0);
+	display.print("You sure?");
+    display.display();
+#ifdef DEBUG
+    Serial.println("--Start dialogue activated");
+#endif
+	delay(2000);
+	current = millis() + 10000;
+	// ten second timeout 
+	while (millis < current) {	
+			if (!digitalRead(START)) { 
+			clearRect(0, 0, 128, 32);
+			display.setCursor(0,0);
+			display.print("Time until release");
+			started = true;
+			display.setTextSize(2);
+			current = 0;
+			break;
+		}
+	}
 }
 
 /* formatTime(time in ms)
@@ -185,6 +176,20 @@ char* formatTime(long time) {
 	return out;
 }
 
+void releaseSequence() {
+#ifdef DEBUG
+    Serial.println("Releasing glider");
+#endif
+    display.setCursor(0,0);
+	clearRect(0,0,128,32);
+	display.print(F("es gibt nichts\nwas mich haelt\nau revoir"));
+	display.display();
+    current = millis() + SERVO_TIME;
+	while (millis < current)servo.write(180); 		// unwind the nuts
+		servo.write(90);							// stop rotation
+		while (1) asm volatile("nop"); 				// idle
+}		
+
 #ifdef DEBUG
 /* debug_variables()
  * prints out a multiline string with all system vaiables at INTERVAL intervals */
@@ -194,5 +199,4 @@ void debug_variables() {
 	Serial.println(debugOut);
 	slu = millis() + INTERVAL;
 }
-#endif
-
+#endif // DEBUG
