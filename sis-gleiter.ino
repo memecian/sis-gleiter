@@ -27,7 +27,7 @@
 /* global vars */
 bool started, dialogue, released = false;
 unsigned long remaining = FLIGHT_TIME;
-char *remainOut = (char*) malloc(sizeof(char) * 21); // reserve 8 chars for formatted time output. 21 bytes reserved, so the compiler shuts up
+char *remainOut = (char*) malloc(sizeof(char) * 10); // reserve 10 chars for formatted time output.
 const char *ready = "Ready to launch.";
 unsigned long current = 0;
 
@@ -69,20 +69,16 @@ void setup() {
 
 void loop(){
   	// loop here
-#ifdef DEBUG
-	Serial.println("Loop!");
-	if (slu <= millis()) debug_variables();
-#endif
     /* winding sequence 
 	 * just a loop to affix the glider to the balloon */
-	if (!digitalRead(SERVO)){
+    if (digitalRead(SERVO)){
     	servo.write(90);// if the button isn't pressed, stop the servo. 
     }
 	else { 
     	servo.write(0); 		
 #ifdef DEBUG
-    Serial.println("---Servo winding---");
-#endif 
+        Serial.println("---Servo winding---");
+#endif     
     }
 
 	if (!started && !digitalRead(START)) startSequence();
