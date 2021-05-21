@@ -71,7 +71,7 @@ void loop(){
   	// loop here
     /* winding sequence 
 	 * just a loop to affix the glider to the balloon */
-    if (digitalRead(SERVO)){
+    if (digitalRead(WINDUP)){
     	servo.write(90);// if the button isn't pressed, stop the servo. 
     }
 	else { 
@@ -154,7 +154,8 @@ void startSequence(void) {
 #ifdef DEBUG
 			Serial.println("--Started countdown.");
 #endif // DEBUG
-		break;
+		    display.setCursor(0,0);
+            break;
 		}
 	}
 }
