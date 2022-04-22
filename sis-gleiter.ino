@@ -195,10 +195,12 @@ void releaseSequence() {
 #endif
     display.setCursor(0,0);
 	clearRect(0,0,128,32);
-	display.print(F("es gibt nichts\nwas mich haelt\nau revoir"));
+	display.print(F("es gibt nichts\n
+					was mich haelt\n
+					au revoir"));
 	display.display();
     current = millis() + SERVO_TIME;
-	while (millis() < current)servo.write(180); 		// unwind the nuts
+	while (millis() < current)servo.write(180); 	// unwind the nuts
 		servo.write(90);							// stop rotation
 		while (1) asm volatile("nop"); 				// idle foreeeeeeeeeeeeever (in other words: until reset)
 }		
