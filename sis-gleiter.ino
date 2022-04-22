@@ -5,6 +5,19 @@
 #include <Adafruit_GFX.h>
 #include <Servo.h>
 
+
+/*
+	An Veit:
+	Dieser Code ist absolut grässlich.
+	Ehrlich gesagt, ohne Kommentare würde ich wahrscheinlich beim durchlesen schon verzweifeln,
+	Neptun sei Dank habe ich eine Obszession mit Kommentaren, und dank Dionysos war Martin
+	für seinen Teil der Arbeit nüchtern :)
+ 	Ich wünsche dir viel Spaß beim umschreiben / verbessern!
+	
+	LG,
+	Alex
+*/
+
 /* defines */
 
 // display
@@ -37,7 +50,8 @@ Servo servo;
 #ifdef DEBUG
 #define INTERVAL 1000 // interval in ms for debug messages
 	char debugOut[128] = {0};
-	long slu = millis() + INTERVAL; //SinceLastUpdate
+	long since_last_update = millis() + INTERVAL; //SinceLastUpdate
+	long generic_counter;
 #endif
 
 void setup() {
@@ -45,6 +59,7 @@ void setup() {
 #ifdef DEBUG
     Serial.begin(9600);
     Serial.println("Starting display setup");
+	generic_counter = millis();
 #endif 	
     // setup here
 	display.begin(SSD1306_SWITCHCAPVCC, ADDR);
@@ -55,7 +70,8 @@ void setup() {
   	display.setTextSize(0);
 
 #ifdef DEBUG
-    Serial.println("Display setup complete.");
+	generic_counter = millis() - generic_counter;
+    Serial.println("Display setup complete. (" + generic_counter + "ms)");
 #endif
     servo.attach(SERVO);
 	pinMode(START, INPUT_PULLUP);	// ATTENTION!
@@ -184,7 +200,7 @@ void releaseSequence() {
     current = millis() + SERVO_TIME;
 	while (millis() < current)servo.write(180); 		// unwind the nuts
 		servo.write(90);							// stop rotation
-		while (1) asm volatile("nop"); 				// idle
+		while (1) asm volatile("nop"); 				// idle foreeeeeeeeeeeeever (in other words: until reset)
 }		
 
 #ifdef DEBUG
@@ -195,6 +211,6 @@ void debug_variables() {
 	Serial.println(remainOut);
 	sprintf(debugOut, "started = %u\nreleased = %u\nremaining = %lu\nremainOut = %s\ncurrent = %lu", started, released, remaining, remainOut, current);
 	Serial.println(debugOut);
-	slu = millis() + INTERVAL;
+ since_last_update = millis() + INTERVAL;
 }
 #endif // DEBUG
